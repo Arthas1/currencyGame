@@ -1,8 +1,9 @@
 package com.java21.waluty.gui;
 
 
-
 import com.java21.waluty.controller.CurrencyClient;
+import com.java21.waluty.entity.CurrencyRank;
+import com.java21.waluty.repo.CurrencyRankRepo;
 import com.vaadin.flow.component.button.Button;
 
 import com.vaadin.flow.component.html.Image;
@@ -18,16 +19,15 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
-
+import org.springframework.security.core.context.SecurityContextHolder;
 
 
 import java.math.BigDecimal;
 
 import java.math.RoundingMode;
 
+import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicInteger;
-
 
 
 @Route("game")
@@ -35,15 +35,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CurrencyGui extends VerticalLayout {
 
 
-
     @Autowired
 
-    public CurrencyGui(CurrencyClient currencyClient) {
+    public CurrencyGui(CurrencyClient currencyClient, CurrencyRankRepo currencyRankRepo) {
 
         AtomicInteger counter = new AtomicInteger();
 
         Label labelFinnalResult = new Label("Liczba podejść");
-
 
 
         Double eur = currencyClient.getCurrencyRates().getRates().getEUR();
@@ -53,7 +51,6 @@ public class CurrencyGui extends VerticalLayout {
         BigDecimal bigDecimalPlnValue = new BigDecimal(1);
 
         BigDecimal bigDecimalToGuess = bigDecimalPlnValue.divide(bigDecimalRawCurrency, 2, RoundingMode.CEILING);
-
 
 
         Label labelCurrencyFrom = new Label("Z waluty");
@@ -94,8 +91,13 @@ public class CurrencyGui extends VerticalLayout {
                 labelFinnalResult.setText("GRATULACJE! udao się za " + counter.get());
 
 
-                add(new Image("https://media1.giphy.com/media/2sXf9PbHcEdE1x059I/giphy.gif","super!"));
+                add(new Image("https://media1.giphy.com/media/2sXf9PbHcEdE1x059I/giphy.gif", "super!"));
 
+                Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+                CurrencyRank currencyRank = new CurrencyRank(principal.toString(), counter.get(), LocalDate.now());
+
+                currencyRankRepo.save(currencyRank);
 
             } else if (result >= 1) {
 
@@ -119,6 +121,7 @@ public class CurrencyGui extends VerticalLayout {
         hl2.add(textFieldUserValue, button, labelResult);
 
         add(hl1, hl2, labelFinnalResult);
+
 
     }
 
