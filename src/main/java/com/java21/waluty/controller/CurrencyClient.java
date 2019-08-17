@@ -10,12 +10,14 @@ import org.springframework.web.client.RestTemplate;
 public class CurrencyClient {
 
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void getRates(){
+   // @EventListener(ApplicationReadyEvent.class)
+    public Example getCurrencyRates(){
 
         RestTemplate restTemplate = new RestTemplate();
-        Example forObjesct = restTemplate.getForObject("https://api.exchangeratesapi.io/latest?base=PLN", Example.class);
-        System.out.println(forObjesct);
+        Example forObject = restTemplate.getForObject("https://api.exchangeratesapi.io/latest?base=PLN", Example.class);
+      //  System.out.println(forObjesct);
+
+        return forObject;
     }
 
 }
